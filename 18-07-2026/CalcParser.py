@@ -40,6 +40,10 @@ class CalcParser(Parser):
     def T(self, value):
         return value[0]
 
+    @_('NUMBER "^" F')
+    def F(self, value):
+        return value[0] ** value[2]
+
     # F-> NUMBER
     @_('NUMBER')
     def F(self, value):
@@ -48,7 +52,7 @@ class CalcParser(Parser):
 
 lexer = CalcLexer()
 parser = CalcParser()
-inp = '10-2*3+2*5'
+inp = '1089-2^3^2*5'
 result = parser.parse(lexer.tokenize(inp))
 print(result)
 
