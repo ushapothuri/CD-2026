@@ -1,4 +1,4 @@
-# Generating Three-Address Code from an AST
+#  Lab Practice 3 —Generating Three-Address Code from an AST
 
 This lab exercise demonstrates how a compiler generates **Three-Address Code (TAC)** from an **Abstract Syntax Tree (AST)**. The AST is traversed in **postorder (bottom-up)** so that the value of each subexpression is computed before it is used by its parent node.
 

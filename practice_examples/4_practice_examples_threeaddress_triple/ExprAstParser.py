@@ -65,11 +65,11 @@ class ExprAstParser(Parser):
 
 lexer = ExprAstLexer()
 parser = ExprAstParser()
-inp = 'x=(a+b)*c'
+inp = 'x=a*5+b*c/d'
 result = parser.parse(lexer.tokenize(inp))
 #print(pretty(result))
 #to_dot(result)
-insts = generate_for_statement(result)
-tac = render_threeAddressCode(insts)
+tripleprogram = generate_for_statement(result)
+tac = render_threeAddressCode(tripleprogram)
 print(tac)
 

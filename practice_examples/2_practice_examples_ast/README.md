@@ -1,4 +1,4 @@
-# Lab Practice — Building an AST for Assignment + Arithmetic Expressions
+# Lab Practice 2 — Building an AST for Assignment + Arithmetic Expressions
 
 Extends the calculator (`../CalcLexer.py` / `../CalcParser.py`) in exactly one way: instead of
 *evaluating* an expression to a number, the parser now *builds a tree* representing it — an

@@ -1,19 +1,19 @@
 """
-TinyCStr AST node definitions -- fully implemented.
+AST node definitions 
 
-
-Every node implements two small methods instead of hand-writing a
+IMPORTANT:  
+- Abstarct Syntax Tree for expressions
+- Every node implements two small methods instead of hand-writing a
 pretty-printer and a DOT exporter per class:
     label()    -- one-line display text for this node
     children() -- list of child AST nodes (empty for leaves)
-`pretty()` and `to_dot()` below are generic tree-walkers built once on
+`pretty()` and `to_dot()` are generic tree-walkers built once on
 top of those two methods, so every node's printed/exported form stays
-consistent by construction
+consistent by construction.
 """
 
-
 class ASTNode:
-    """Base class for all TinyCStr AST nodes."""
+    """Base class for all AST nodes."""
 
     def label(self):
         return type(self).__name__
@@ -50,19 +50,8 @@ class Assign(ASTNode):
         return [self.var, self.expr]
 
 
-class Print(ASTNode):
-    def __init__(self, expr):
-        self.expr = expr
-
-    def label(self):
-        return "Print"
-
-    def children(self):
-        return [self.expr]
-
 
 class BinOp(ASTNode):
-    """Stage 1b only -- not used until arithmetic expressions are added."""
 
     def __init__(self, op, left, right):
         self.op = op
@@ -91,7 +80,7 @@ def pretty(node, indent=0):
 def to_dot(node, graph_name="AST",filename="ast.dot"):
     '''
     Renders an AST subtree as Graphviz DOT source. 
-    run `dot -Tpng ast.dot -o ast.png` (or any Graphviz frontend) to view it. 
+    Feed the output to dot -Tpng ast.dot -o ast.png (or any Graphviz frontend) to view it. 
     '''
     lines = [f"digraph {graph_name} {{"]
     counter = 0

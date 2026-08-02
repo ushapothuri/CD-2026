@@ -1,10 +1,8 @@
 """
-TinyCStr Level 1 Lexer 
+TinyCStr Level 1 Lexer -- fully implemented.
 
-This is a verified, working Level 1 lexer (Stages 1a + 1b). It is provided
-here, already complete, so that Week 3 is graded on PARSER correctness
-in isolation  Use this file as-is; you do not need to modify it
-this week.
+This is a verified, working Level 1 lexer (Stages 1a + 1b). 
+ Use this file as-is; you do not need to modify it this week.
 """
 from sly import Lexer
 import sys
