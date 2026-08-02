@@ -194,6 +194,10 @@ class TinyCStrParser(Parser):
     def expr(self , value):
         return BinOp('%', value[0], value[2])
 
+    @_('LPAREN expr RPAREN')
+    def expr(self , value):
+        return value[1] 
+
     # (MINUS, TIMES, DIVIDE similarly; LPAREN expr RPAREN just returns
     # the inner expr unchanged -- parentheses don't need their own node)
 
@@ -207,7 +211,9 @@ class TinyCStrParser(Parser):
         Keep this simple for Level 1 --
         structured error recovery is not required this week.
         """
-        raise NotImplementedError("implement TinyCStrParser.error()")
+        self.had_error = True
+        print(f"SYNTAX ERROR at {token.value} in line number {token.lineno}")
+        #raise NotImplementedError("implement TinyCStrParser.error()")
 
 
 if __name__ == '__main__':
