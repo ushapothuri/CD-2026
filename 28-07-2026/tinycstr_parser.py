@@ -95,7 +95,7 @@ class TinyCStrParser(Parser):
 
     @_('id_list COMMA ID')
     def id_list(self, value):
-        return value[0] + value[2]
+        return value[0] + [value[2]]
 
     @_('ID')
     def id_list(self, value):
