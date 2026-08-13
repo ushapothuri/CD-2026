@@ -1,14 +1,20 @@
 """
-Function --  fully implemented.
+Function -- fully implemented; 
 
 Function has:
-1. local SymbolTable -  contains information about all the local variables used in the function, 
-which is mainly populated when declarations are parsed
-2. AST list :  holds the statement AST list for one function, except declaration statement 
-3. tripleTACstmts : holds the list of three address code statements in triples form
+1. local SymbolTable - contains information about all the local variables used in the function,
+   which is mainly populated when declarations are parsed
+2. AST list: holds the statement AST list for one function, except declaration statements
+3. tripleTACstmts: holds the list of three address code statements in triples form
+4. mipsCode: holds the rendered MIPS assembly text for this function, once
+   compile() has run -- None until then.
+
 """
 from SymbolTable import SymbolTable
 from three_address_code import TripleTAC
+from tac_generator import TACGenerator
+from tac_to_mips import MIPSGenerator
+
 
 class Function:
     def __init__(self, returnType, name):
@@ -17,6 +23,7 @@ class Function:
         self.statementsAstList = []
         self.localSymbolTable = SymbolTable()
         self.tripleTACstmts = TripleTAC()
+        self.mipsCode = None  
 
     def setStatementsAstList(self, sastList):
         self.statementsAstList = sastList
@@ -47,6 +54,12 @@ class Function:
         return self.tripleTACstmts.render()
 
     def compile(self):
-        pass
+        self.localSymbolTable.assignOffsetsToSymbols()
+        mips_gen = MIPSGenerator(self.localSymbolTable)
+        frame_size = self.localSymbolTable.size()
+        self.mipsCode = mips_gen.generate(self.tripleTACstmts.triples, frame_size)
+        
 
-
+    def getMipsCode(self):
+        """Returns None if compile() hasn't run yet."""
+        return self.mipsCode
