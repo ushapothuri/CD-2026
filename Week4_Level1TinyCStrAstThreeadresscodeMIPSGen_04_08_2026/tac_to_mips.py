@@ -93,7 +93,12 @@ class MIPSGenerator:
         Use self.symbol_table.getSymbol(name).getOffset() to get the
         integer offset, then format it as f"{offset}($fp)".
         """
-        raise NotImplementedError("implement MIPSGenerator.resolve_address()")
+        symbol = self.symbol_table.getSymbol(name)
+        offset = symbol.getOffset()
+        return f"{offset}($fp)"
+
+
+        # raise NotImplementedError("implement MIPSGenerator.resolve_address()")
 
     def load(self, operand, reg):
         """
@@ -108,7 +113,11 @@ class MIPSGenerator:
         by reusing the already-live register from triple_index_to_reg,
         never by loading from memory.
         """
-        raise NotImplementedError("implement MIPSGenerator.load()")
+        if is_literal(operand):
+            self.addMIPS(f"li {reg}, {operand}")
+        else:
+            self.addMIPS(f"lw {reg}, {self.resolve_address(operand)}")
+        # raise NotImplementedError("implement MIPSGenerator.load()")
 
     def store(self, reg, name):
         """
@@ -116,7 +125,10 @@ class MIPSGenerator:
         deallocate_register(reg) -- once a value has been written back
         to a variable's slot, the register holding it is free to reuse.
         """
-        raise NotImplementedError("implement MIPSGenerator.store()")
+        self.addMIPS(f"sw {reg}, {self.resolve_address(name)}")
+        self.deallocate_register(reg)
+
+        # raise NotImplementedError("implement MIPSGenerator.store()")
 
     def gen_instr(self, triple):
         """
@@ -153,8 +165,65 @@ class MIPSGenerator:
         example of this dispatch on a small triple program, including
         exactly which registers get allocated/reused/freed at each step.
         """
-        raise NotImplementedError("implement MIPSGenerator.gen_instr()")
 
+        if isinstance(triple, BinOpTriple):
+
+            if isinstance(triple.arg1, TripleRef):
+                src1 = self.triple_index_to_reg[triple.arg1.index]
+                arg1_is_ref = True
+            else:
+                src1 = self.allocate_registers()
+                self.load(triple.arg1, src1)
+                arg1_is_ref = False
+
+            if isinstance(triple.arg2, TripleRef):
+                src2 = self.triple_index_to_reg[triple.arg2.index]
+                arg2_is_ref = True
+            else:
+                src2 = self.allocate_registers()
+                self.load(triple.arg2, src2)
+                arg2_is_ref = False
+
+            dest = self.allocate_registers()
+
+            self.addMIPS(
+                f"{MIPS_OP[triple.op]} {dest}, {src1}, {src2}"
+            )
+
+            self.triple_index_to_reg[triple.index] = dest
+
+            if not arg1_is_ref:
+                self.deallocate_register(src1)
+
+            if not arg2_is_ref:
+                self.deallocate_register(src2)
+
+        elif isinstance(triple, AssignTriple):
+
+            if isinstance(triple.arg1, TripleRef):
+                reg = self.triple_index_to_reg[triple.arg1.index]
+                self.store(reg, triple.dest)
+            else:
+                reg = self.allocate_registers()
+                self.load(triple.arg1, reg)
+                self.store(reg, triple.dest)
+
+        elif isinstance(triple, PrintTriple):
+
+            if isinstance(triple.arg1, TripleRef):
+                reg = self.triple_index_to_reg[triple.arg1.index]
+                is_ref = True
+            else:
+                reg = self.allocate_registers()
+                self.load(triple.arg1, reg)
+                is_ref = False
+
+            self.addMIPS(f"move $a0, {reg}")
+            self.addMIPS("li $v0, 1")
+            self.addMIPS("syscall")
+
+            if not is_ref:
+                self.deallocate_register(reg)
     # ------------------------------------------------------------------
     # Prologue / epilogue -- PROVIDED, not a TODO. Exact sequence from
     # the Frame-based Linkage Convention; see docs/mips_spim_reference.md.
