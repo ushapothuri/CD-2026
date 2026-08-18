@@ -14,7 +14,7 @@ from three_address_code import TripleTAC, BinOpTriple, AssignTriple, PrintTriple
 
 class TACGenerator:
     def __init__(self):
-        self.program = TripleProgram()
+        self.program = TripleTAC()
 
     def generate(self, function):
         """
