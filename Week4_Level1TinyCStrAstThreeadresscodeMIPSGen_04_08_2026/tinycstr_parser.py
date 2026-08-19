@@ -19,11 +19,7 @@ class TinyCStrParser(Parser):
 
     precedence = (
         ('left', 'PLUS', 'MINUS'),
-<<<<<<< HEAD
-        ('left', 'TIMES', 'DIVIDE','REMAINDER'),
-=======
         ('left', 'TIMES', 'DIVIDE' , 'REMAINDER'),
->>>>>>> tac generator modified
     )
 
     def __init__(self):
@@ -116,11 +112,7 @@ class TinyCStrParser(Parser):
     def expr(self, p):
         return BinOp('/', p.expr0, p.expr1)
 
-<<<<<<< HEAD
     @_('expr REMAINDER expr')
-=======
-    @_('expr REMAINDER  expr')
->>>>>>> tac generator modified
     def expr(self, p):
         return BinOp('%', p.expr0, p.expr1)
 

@@ -1,10 +1,13 @@
-#!/usr/bin/env python3
 """
 TinyCStr compiler driver.
 
 Usage:
     python main.py [options] file
 
+WEEK 6 CHANGES:
+  - `-check` flag runs the semantic/type checker and writes an error report
+    plus the type-checked AST (showing any inserted casts) to `<file>.check`.
+  - `-symtab` -- writes each function's symbol table to `<file>.sym`.
 """
 import argparse
 import sys
@@ -12,6 +15,7 @@ import sys
 from tinycstr_lexer import TinyCStrLexer
 from tinycstr_parser import TinyCStrParser
 from ast_nodes import pretty
+from type_checker import check_program
 
 
 def write_tokens(source_path, out_file):
@@ -47,31 +51,90 @@ def check_parse_only(source_path):
     return not had_error
 
 
+def write_symtab(source_path, out_file):
+
+    program, had_error = _parse_source(source_path)
+    if had_error:
+        print("# parse error -- cannot show symbol table", file=out_file)
+        return
+    for func in program.getFunctions():
+        print(f"Function {func.getName()}", file=out_file)
+        symtab = func.getLocalSymbolTable()
+        if not symtab.table:
+            print("  (no local variables)", file=out_file)
+        for entry in symtab.table:
+            print(f"  {entry.getSymbolName()}: {entry.getDataType()}", file=out_file)
+
+
+def write_check(source_path, out_file):
+    """
+    Runs the type checker and writes an error report,
+    followed by the type-checked AST (which may now contain Cast nodes
+    see type_checker.py's module docstring).
+    """
+    program, had_error = _parse_source(source_path)
+    if had_error:
+        print("# parse error -- cannot type-check", file=out_file)
+        return
+    errors = check_program(program)
+    if errors:
+        print(f"{len(errors)} type error(s) found:", file=out_file)
+        for e in errors:
+            print(f"  {e}", file=out_file)
+    else:
+        print("No type errors found.", file=out_file)
+    print(file=out_file)
+    print("Type-checked AST (with any inserted casts):", file=out_file)
+    for func in program.getFunctions():
+        print(f"Function {func.getName()}", file=out_file)
+        for stmt in func.getStatementsAstList():
+            print(pretty(stmt, indent=1), file=out_file)
+
+
+def _type_check_gate(program, out_file):
+    
+    errors = check_program(program)
+    if errors:
+        print(f"# {len(errors)} type error(s) found -- cannot proceed:", file=out_file)
+        for e in errors:
+            print(f"# {e}", file=out_file)
+        return False
+    return True
+
+
 def write_3ac_debug(source_path, out_file):
-    """
-    Not one of the original driver's flags -- a debugging aid so you can
-    inspect the triple-form 3AC without reading MIPS. Wired to `-3ac`.
-    """
     program, had_error = _parse_source(source_path)
     if had_error:
         print("# parse error -- cannot generate 3AC", file=out_file)
         return
-    program.generateTripleTAC()
+    if not _type_check_gate(program, out_file):
+        return
+    try:
+        program.generateTripleTAC()
+    except Exception:
+        not_implemented_stage(
+            '3ac generation for Level 2 constructs (RelOp/Cast/Ternary, '
+            'non-INT variables)', planned_week=7, out_file=out_file)
+        return
     func = program.getFunctions()[0]
     out_file.write(func.renderTripleTAC() + "\n")
 
 
 def write_compile(source_path, out_file):
-    """
-    WEEK 4: full pipeline via the OOP flow described in the module
-    docstring above. Only handles a single function (main) for now 
-    """
     program, had_error = _parse_source(source_path)
     if had_error:
         print("# parse error -- cannot compile", file=out_file)
         return
-    program.generateTripleTAC()
-    program.compile()
+    if not _type_check_gate(program, out_file):
+        return
+    try:
+        program.generateTripleTAC()
+        program.compile()
+    except Exception:
+        not_implemented_stage(
+            'compile for Level 2 constructs (RelOp/Cast/Ternary, '
+            'non-INT variables)', planned_week=7, out_file=out_file)
+        return
     func = program.getFunctions()[0]
     out_file.write(func.getMipsCode())
 
@@ -95,6 +158,9 @@ def build_arg_parser():
                          help="Show abstract syntax trees in file.ast (or out.ast)")
     parser.add_argument('-symtab', action='store_true',
                          help="Show symbol table in file.sym (or out.sym)")
+    parser.add_argument('-check', action='store_true',
+                         help="[not in original spec] Run the type checker, "
+                              "write errors + checked AST to file.check")
     parser.add_argument('-3ac', action='store_true', dest='threeac',
                          help="[not in original spec] Show 3-address code (triples) in file.3ac")
     parser.add_argument('-compile', action='store_true',
@@ -107,12 +173,6 @@ def main(argv=None):
     parser = build_arg_parser()
     args = parser.parse_args(argv)
 
-
-    # args.compile = True  # default value -- see Week 2/3's main.py for rationale
-
-  #  args.compile = True  # default value -- see Week 2/3's main.py for rationale
-
-
     if args.tokens:
         with open(args.file + ".toks", "w") as f:
             write_tokens(args.file, f)
@@ -122,7 +182,7 @@ def main(argv=None):
         args.compile = False
         ok = check_parse_only(args.file)
         if ok:
-            print(f"[main.py] '{args.file}' parses successfully (Level 1 grammar).")
+            print(f"[main.py] '{args.file}' parses successfully.")
         else:
             print(f"[main.py] '{args.file}' has a syntax error -- see messages above.",
                   file=sys.stderr)
@@ -132,17 +192,21 @@ def main(argv=None):
         with open(args.file + ".ast", "w") as f:
             write_ast(args.file, f)
 
+    if args.symtab:
+        with open(args.file + ".sym", "w") as f:
+            write_symtab(args.file, f) 
+             
+    if args.check:
+        with open(args.file + ".check", "w") as f:
+            write_check(args.file, f)  
+
     if args.threeac:
         with open(args.file + ".3ac", "w") as f:
             write_3ac_debug(args.file, f)
 
-    if args.symtab:
-        with open(args.file + ".sym", "w") as f:
-            not_implemented_stage('symtab', planned_week=6, out_file=f)
-
     if args.compile:
         with open(args.file + ".spim", "w") as f:
-            write_compile(args.file, f)  
+            write_compile(args.file, f)
 
 
 if __name__ == '__main__':
