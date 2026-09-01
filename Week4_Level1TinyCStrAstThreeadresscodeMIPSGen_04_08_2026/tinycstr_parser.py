@@ -114,7 +114,9 @@ class TinyCStrParser(Parser):
 
     @_('expr REMAINDER expr')
     def expr(self, p):
-            return BinOp('%', p.expr0, p.expr1)
+        return BinOp('%', p.expr0, p.expr1)
+    
+
 
     @_('LPAREN expr RPAREN')
     def expr(self, p):
