@@ -41,6 +41,9 @@ class TinyCStrLexer(Lexer):
     keywords = {
         'int': 'INT',
         'print': 'PRINT',
+        'double':'DOUBLE',
+        'char':'CHAR',
+        'string':'STRING'
         # TODO(week-5, stage-2a): add 'double': 'DOUBLE'
         # TODO(week-5, stage-2b): add 'char': 'CHAR', 'string': 'STRING'
     }
@@ -54,7 +57,16 @@ class TinyCStrLexer(Lexer):
     def NUMBER(self, t):
         t.value = int(t.value)
         return t
-    
+
+    LT = r'<'
+    GT = r'>'
+    LE = r'<='
+    GE = r'>='
+    EQ = r'=='
+    NE = r'!='
+    QUESTION = r'\?'
+    COLON = r':'
+
     ASSIGN = r'='
     SEMICOLON = r';'
     LBRACE = r'\{'
@@ -67,6 +79,26 @@ class TinyCStrLexer(Lexer):
     REMAINDER = r'%'
     LPAREN = r'\('
     RPAREN = r'\)'
+
+
+    @_(r'\d+\.\d+')
+    def REAL_CONST(self , t):
+        t.value = float(t.value)
+        return t
+
+    """
+    @_(r"([^'\\]|\\.)'")
+    """
+    @_(r"'.'")
+    def CHAR_CONST(self , t):
+        t.value = t.value[1:-1]
+        return t
+
+   
+    @_(r'".*"')  
+    def STRING_CONST(self , t):
+        t.value = t.value[1:-1]
+        return t
 
     # ------------------------------------------------------------------
     # LEVEL 2, Stage 2a -- real constants
