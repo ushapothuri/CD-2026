@@ -99,14 +99,14 @@ class MIPSGenerator:
 
     def load(self, operand, reg):
         if is_literal(operand):
-            self.emit(f"li {reg} , {operand}")
+            self.addMIPS(f"li {reg} , {operand}")
         else:
-            self.emit(f"lw {reg} , {self.resolve_address(operand)}")
+            self.addMIPS(f"lw {reg} , {self.resolve_address(operand)}")
         """
         TODO(week-4): emit ONE instruction that gets `operand`'s value
         into `reg`.
           - If is_literal(operand) is True: emit `li reg, operand`
-          - Otherwise (operand is a variable name string):
+         0 - Otherwise (operand is a variable name string):
                 emit `lw reg, {self.resolve_address(operand)}`
 
         Note: this is only ever called with a literal or a variable
@@ -117,7 +117,7 @@ class MIPSGenerator:
         # raise NotImplementedError("implement MIPSGenerator.load()")
 
     def store(self, reg, name):
-        self.emit(f"sw {reg} , {self.resolve_address(name)}")
+        self.addMIPS(f"sw {reg} , {self.resolve_address(name)}")
         self.deallocate_register(reg)
         """
         TODO(week-4): emit `sw reg, {self.resolve_address(name)}`, then
@@ -168,7 +168,7 @@ class MIPSGenerator:
             self.addMIPS("syscall")
 
             if not isinstance(triple.arg1 , TripleRef):
-                self.deallocate(src)
+                self.deallocate_register(src)
         """
         TODO(week-4): dispatch on the triple's type and emit MIPS.
 
@@ -203,7 +203,7 @@ class MIPSGenerator:
         example of this dispatch on a small triple program, including
         exactly which registers get allocated/reused/freed at each step.
         """
-        raise NotImplementedError("implement MIPSGenerator.gen_instr()")
+        #raise NotImplementedError("implement MIPSGenerator.gen_instr()")
 
     # ------------------------------------------------------------------
     # Prologue / epilogue -- PROVIDED, not a TODO. Exact sequence from
