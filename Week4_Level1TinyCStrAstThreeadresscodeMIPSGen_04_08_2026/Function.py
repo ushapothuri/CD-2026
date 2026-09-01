@@ -12,7 +12,7 @@ Function has:
 """
 from SymbolTable import SymbolTable
 from three_address_code import TripleTAC
-from tac_generator import TACGenerator
+from tac_generator import MIPSGenerator
 from tac_to_mips import MIPSGenerator
 
 
