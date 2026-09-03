@@ -22,19 +22,11 @@ class TinyCStrParser(Parser):
     debugfile = 'parser.out'
 
     precedence = (
-<<<<<<< HEAD
-            ('right' , 'QUESTION' , 'COLON'),
-            ('left' , 'LT' , 'GT' , 'LE' , 'GE' , 'EQ' , 'NE'),
-            ('left', 'PLUS', 'MINUS'),
-            ('left', 'TIMES', 'DIVIDE'),
-            ('right', 'UCAST')
-=======
         ('right','QUESTION','COLON'),   
         ('left','LT','GT','LE','GE','EQ','NE'),   
         ('left', 'PLUS', 'MINUS'),
         ('left', 'TIMES', 'DIVIDE','REMAINDER'),
         ('right','UCAST')
->>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
         # TODO(week-5, stage-2b): relational operators less precedence than
         # arithmetic so their precedence entry must be
         # ADDED ABOVE the two lines already here, not below -- remember
@@ -96,20 +88,6 @@ class TinyCStrParser(Parser):
         return [SymbolTableEntry(name, DataType.INT) for name in value[1]]
 
     @_('DOUBLE id_list SEMICOLON')
-<<<<<<< HEAD
-    def decl(self, value):
-        return [SymbolTableEntry(name, DataType.DOUBLE) for name in value[1]]
-
-    @_('CHAR id_list SEMICOLON')
-    def decl(self, value):
-        return [SymbolTableEntry(name, DataType.CHAR) for name in value[1]]
-
-    @_('STRING id_list SEMICOLON')
-    def decl(self, value):
-        return [SymbolTableEntry(name, DataType.STRING) for name in value[1]]
-
-
-=======
     def decl(self,value):
         return [SymbolTableEntry(name,DataType.DOUBLE) for name in value[1]]
 
@@ -121,7 +99,6 @@ class TinyCStrParser(Parser):
     def decl(self,value):
         return [SymbolTableEntry(name,DataType.STRING) for name in value[1]]
     
->>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
 
     # TODO(week-5, stage-2a): add a `decl` alternative for
     # `DOUBLE id_list SEMICOLON`, producing SymbolTableEntry objects
