@@ -1,53 +1,103 @@
 """
-TinyCStr Level 1 Lexer -- REFERENCE IMPLEMENTATION for Week 3.
+TinyCStr Level 1 Lexer (Stages 1a -> 1b)
 
-This is a verified, working Level 1 lexer (Stages 1a + 1b). It is provided
-here, already complete, so that Week 3 is graded on PARSER correctness
-in isolation -- if your own Week 2 tinycstr_lexer.py still has a bug,
-importing your own copy here would make a lexer bug look like a parser
-bug. Use this file as-is; you do not need to modify it
-this week.
+Read docs/token_reference.md and docs/sly_help.md before editing this file.
+
+Fill in the TODOs in order: finish every Stage 1a TODO and get Stage 1b ready.
 """
+
 from sly import Lexer
-import sys
 
 
 class TinyCStrLexer(Lexer):
+    # ------------------------------------------------------------------
+    # Full Stage 1a + 1b token set is declared here
+    # ------------------------------------------------------------------
     tokens = {
-        INT, ID, NUMBER, PRINT, ASSIGN, SEMICOLON, LBRACE, RBRACE, COMMA,
-        PLUS, MINUS, TIMES, DIVIDE, REMAINDER, LPAREN, RPAREN,
+        INT, ID, INTEGER, PRINT, ASSIGN, SEMICOLON, LBRACE, RBRACE, COMMA,LPAREN, RPAREN,   # Stage 1a
+        PLUS, MINUS, TIMES, DIVIDE,REMAINDER,                     # Stage 1b
     }
+    lineno = 1
+
+    # skip spaces between tokens.
     ignore = ' \t'
+
+    # TODO(week-2, stage-1a): ignore // line comments.
+    # See docs/sly_help.md ###3 for why this must be an `ignore_`-prefixed
+    # string attribute, not a normal token rule.
     ignore_COMMENT = r'//.*'
 
+    # TODO(week-2, stage-1a): count newlines into self.lineno.
+    # See docs/sly_help.md ###4 for the standard pattern.
     @_(r'\n+')
     def ignore_newline(self, t):
         self.lineno += t.value.count('\n')
 
-    keywords = {'int': 'INT', 'print': 'PRINT'}
+    # ------------------------------------------------------------------
+    # Stage 1a: keyword table + identifier rule
+    # ------------------------------------------------------------------
+    # TODO(week-2, stage-1a): fill in the reserved-word(key-word) table.
+    keywords = {
+        'int': 'INT',
+        'print': 'PRINT',
+    }
 
+    # TODO(week-2, stage-1a): implement the ID rule using the
+    # match-then-look-up-in-`keywords` method described in
+    # docs/sly_help.md #1. Do NOT add separate INT/PRINT string rules.
+    #
     @_(r'[a-zA-Z_][a-zA-Z0-9_]*')
     def ID(self, t):
-        t.type = self.keywords.get(t.value, 'ID')
+        t.type = self.keywords.get(t.value , 'ID')
         return t
 
-    NUMBER = r'\d+'
+    # TODO(week-2, stage-1a): INTEGER — one or more decimal digits.
+    INTEGER = r'[0-9]+'
+
+    # TODO(week-2, stage-1a): single-character punctuation tokens.
     ASSIGN = r'='
-    SEMICOLON = r';'
+    SEMICOLON   = r';'
     LBRACE = r'\{'
     RBRACE = r'\}'
-    COMMA = r','
-    PLUS = r'\+'
-    MINUS = r'-'
-    TIMES = r'\*'
-    DIVIDE = r'/'
-    REMAINDER = r'%'
+    COMMA  = r','
     LPAREN = r'\('
     RPAREN = r'\)'
 
-    def __init__(self, error_sink=None):
-        self.error_sink = error_sink if error_sink is not None else sys.stdout
 
+    # ------------------------------------------------------------------
+    # Stage 1b: arithmetic operators and parentheses.
+    # Do not start this section until all Stage 1a golden tests pass.
+    # ------------------------------------------------------------------
+    # TODO(week-2, stage-1b): uncomment and fill in.
+    PLUS   = r'\+'
+    MINUS  = r'-'
+    TIMES  = r'\*'
+    DIVIDE = r'/'
+    REMAINDER = r'%'
+    
+    # ------------------------------------------------------------------
+    # Error handling
+    # ------------------------------------------------------------------
     def error(self, t):
-        print(f"ERROR {t.value[0]} {self.lineno}", file=self.error_sink)
+        """
+        TODO(week-2, stage-1a): report the illegal character and current
+        line number in EXACTLY this format:
+
+            ERROR <character> <lineno>
+        Where <character> is the single bad character and <lineno> is the
+        current line number.    
+
+        Then advance past the single bad character so lexing continues
+        (self.index += 1) rather than stopping at the first error.
+        """
+
+        print(f"ERROR {t.value} {t.lineno}")
         self.index += 1
+        # raise NotImplementedError("implement TinyCStrLexer.error()")
+
+
+if __name__ == '__main__':
+    sample = "int main(){\nint a;\na = 5;\nprint a;\n}"
+    lexer = TinyCStrLexer()
+    for tok in lexer.tokenize(sample):
+        print(tok)
