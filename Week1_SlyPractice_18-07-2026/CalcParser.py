@@ -40,6 +40,10 @@ class CalcParser(Parser):
     def T(self, value):
         return value[0]
 
+    @_('NUMBER "^" F')
+    def F(self, value):
+        return value[0] ** value[2]
+
     # F-> NUMBER
     @_('NUMBER')
     def F(self, value):

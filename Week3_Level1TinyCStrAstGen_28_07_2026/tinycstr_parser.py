@@ -27,9 +27,15 @@ class TinyCStrParser(Parser):
     # before filling this in -- the tuple's ORDER matters and it is the
     # opposite of what most people guess.
     precedence = (
+<<<<<<< HEAD
         ('left', 'PLUS', 'MINUS'),
         ('left', 'TIMES' , 'DIVIDE' , 'REMAINDER'),
      )
+=======
+        ('left', 'PLUS' , 'MINUS'),
+        ('left', 'TIMES', 'DIVIDE', 'REMAINDER')
+    )
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
 
     def __init__(self):
         self.had_error = False
@@ -47,7 +53,10 @@ class TinyCStrParser(Parser):
         p = Program()
         p.addFunction(value[0])
         return p
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
 
     # TODO(week-3, stage-1a): 
     # func_def -> INT ID LPAREN RPAREN LBRACE decl_stmt_list stmt_list RBRACE
@@ -56,11 +65,19 @@ class TinyCStrParser(Parser):
     # stmt_list is a list of stmts it gives ast_list.
     @_('INT ID LPAREN RPAREN LBRACE decl_stmt_list stmt_list RBRACE')
     def func_def(self, value):
+<<<<<<< HEAD
         f = Function(value[0] , value[1])
         for symbol_entry in value[5]:
             f.localSymbolTable.addSymbol(symbol_entry)
         f.setStatementsAstList(value[6])
         return f
+=======
+        f = Function(value[0], value[1])
+        for symbol_entry in value[5]:
+            f.localSymbolTable.addSymbol(symbol_entry)
+        f.setStatementsAstList(value[6])
+        return f    
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
 
     # TODO(week-3, stage-1a): decl_stmt_list -> decl_stmt_list decl | empty
     # Build a flat Python list by appending each stmt (SymbolTableEntry)
@@ -86,20 +103,34 @@ class TinyCStrParser(Parser):
     #
     @_('INT id_list SEMICOLON')
     def decl(self, value):
+<<<<<<< HEAD
         symbol_entry_list =[]
         for name in value[1]:
             symbol_entry_list.append(SymbolTableEntry(name , value[0]))
+=======
+        symbol_entry_list = []
+        for name in value[1]:
+            symbol_entry_list.append(SymbolTableEntry(name, value[0]))
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
         return symbol_entry_list
     
     # TODO(week-3, stage-1a): id_list -> id_list COMMA ID | ID
     # Build a flat Python list of name strings.
 
     @_('id_list COMMA ID')
+<<<<<<< HEAD
     def id_list(self , value):
         return value[0] + [value[2]]
 
     @_('ID')
     def id_list(self , value):
+=======
+    def id_list(self, value):
+        return value[0] + [value[2]]
+
+    @_('ID')
+    def id_list(self, value):
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
         return [value[0]]
     
     
@@ -110,14 +141,18 @@ class TinyCStrParser(Parser):
     @_('stmt_list stmt')
     def stmt_list(self, value):
         return value[0] + [value[1]]
+<<<<<<< HEAD
 
+=======
+    #
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
     @_('empty')
     def stmt_list(self, value):
         return []
     #
-    # @_('')
-    # def empty(self, p):
-    #     pass
+    #@_('')
+    #def empty(self, value):
+    #    pass
 
 
 
@@ -127,20 +162,35 @@ class TinyCStrParser(Parser):
     # / print_stmt respectively 
 
     @_('assign')
+<<<<<<< HEAD
     def stmt(self , value):
         return value[0]
 
     @_('print_stmt')
     def stmt(self , value):
         return value[0]
+=======
+    def stmt(self, value): 
+        return value[0]
+
+    @_('print_stmt')
+    def stmt(self, value):
+        return value[0]
+
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
 
     # TODO(week-3, stage-1a): assign -> ID ASSIGN expr SEMICOLON
     # Build Assign(Var(p.ID), p.expr).
     #
     @_('ID ASSIGN expr SEMICOLON')
     def assign(self, value):
+<<<<<<< HEAD
         return Assign(Var(value[0]) , value[2])
     
+=======
+        return Assign(Var(value[0]), value[2])
+
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
     # TODO(week-3, stage-1a): print_stmt -> PRINT expr SEMICOLON
     # Build Print(p.expr).
     #
@@ -154,12 +204,21 @@ class TinyCStrParser(Parser):
     #
     @_('NUMBER')
     def expr(self, value):
+<<<<<<< HEAD
         return Num(int(value[0]))
+=======
+        return Num(value[0])
+
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
     #
     @_('ID')
     def expr(self, value):
         return Var(value[0])
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
     # ------------------------------------------------------------------
     # Stage 1b: arithmetic expressions.
     # Do not start this section until every Stage 1a golden AST test
@@ -189,12 +248,22 @@ class TinyCStrParser(Parser):
         return BinOp('/', value[0], value[2])
 
     @_('expr REMAINDER expr')
+<<<<<<< HEAD
     def expr(self, value):
         return BinOp('%', value[0], value[2])
 
     @_('LPAREN expr RPAREN')
     def expr(self, value):
         return value[1]
+=======
+    def expr(self , value):
+        return BinOp('%', value[0], value[2])
+
+    @_('LPAREN expr RPAREN')
+    def expr(self , value):
+        return value[1] 
+
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
     # (MINUS, TIMES, DIVIDE similarly; LPAREN expr RPAREN just returns
     # the inner expr unchanged -- parentheses don't need their own node)
 
@@ -209,8 +278,13 @@ class TinyCStrParser(Parser):
         structured error recovery is not required this week.
         """
         self.had_error = True
+<<<<<<< HEAD
         print(f"SYNTAX ERROR at {token.value} on line {token.lineno}")
         # raise NotImplementedError("implement TinyCStrParser.error()")
+=======
+        print(f"SYNTAX ERROR at {token.value} in line number {token.lineno}")
+        #raise NotImplementedError("implement TinyCStrParser.error()")
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
 
 
 if __name__ == '__main__':

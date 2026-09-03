@@ -1,1 +1,15 @@
+<<<<<<< HEAD
 # parse error -- AST may be incomplete
+=======
+Function main
+  Assign
+    Var(a)
+    Const(5,DataType.INT)
+  Assign
+    Var(b)
+    Const(3.14,DataType.DOUBLE)
+  Print
+    Var(a)
+  Print
+    Var(b)
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1

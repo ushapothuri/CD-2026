@@ -54,6 +54,10 @@ class Function:
         return self.tripleTACstmts.render()
 
     def compile(self):
+        self.localSymbolTable.assignOffsetsToSymbols()
+        mips_gen = MIPSGenerator(self.localSymbolTable)
+        frame_size = self.localSymbolTable.size()
+        self.mipsCode = mips_gen.generate(self.tripleTACstmts.triples, frame_size)
         """
         TODO(week-4): produce this function's complete MIPS assembly and
         store it in self.mipsCode. Steps, in order:
@@ -64,6 +68,7 @@ class Function:
              offset (0, 4, 8, ... in declaration order) -- this MUST run
              before step 2, since MIPSGenerator needs those offsets to
              emit correct lw/sw instructions.
+
 
           2. mips_gen = MIPSGenerator(self.localSymbolTable)
              frame_size = self.localSymbolTable.size()
@@ -79,11 +84,14 @@ class Function:
         for the required call order: parse -> program.generateTripleTAC()
         -> program.compile().)
         """
+<<<<<<< HEAD
         self.localSymbolTable.assignOffsetsToSymbols()
         mips_gen = MIPSGenerator(self.localSymbolTable)
         frame_size = self.localSymbolTable.size()
         self.mipsCode = mips_gen.generate(self.tripleTACstmts.triples, frame_size)
         
+=======
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
         #raise NotImplementedError("implement Function.compile()")
 
     def getMipsCode(self):

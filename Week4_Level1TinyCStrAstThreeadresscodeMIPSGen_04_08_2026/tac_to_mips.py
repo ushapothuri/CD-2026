@@ -84,8 +84,18 @@ class MIPSGenerator:
         self.mips_lines.append(line)
 
     def resolve_address(self, name):
+<<<<<<< HEAD
         offset = self.symbol_table.getSymbol(name).getOffset()
         return f"{offset}($fp)"
+=======
+        symbol=self.symbol_table.getSymbol(name)
+        offset=symbol.getOffset()
+        return f"{offset}($fp)"
+    
+
+
+
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
         """
         TODO(week-4): `name` is a real declared variable's name (a
         string) -- NOT a literal, NOT a TripleRef (callers only pass
@@ -95,6 +105,7 @@ class MIPSGenerator:
         Use self.symbol_table.getSymbol(name).getOffset() to get the
         integer offset, then format it as f"{offset}($fp)".
         """
+<<<<<<< HEAD
        # raise NotImplementedError("implement MIPSGenerator.resolve_address()")
 
     def load(self, operand, reg):
@@ -104,16 +115,26 @@ class MIPSGenerator:
             self.addMIPS(f"lw {reg} , {self.resolve_address(operand)}")
         """
         TODO(week-4): emit ONE instruction that gets `operand`'s value
+=======
+        #raise NotImplementedError("implement MIPSGenerator.resolve_address()")
+
+    def load(self, operand, reg):
+        if is_literal(operand):
+            self.addMIPS(f"li {reg}, {operand}")
+        else:
+            self.addMIPS(f"lw {reg}, {self.resolve_address(operand)}")
+        """TODO(week-4): emit ONE instruction that gets `operand`'s value
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
         into `reg`.
           - If is_literal(operand) is True: emit `li reg, operand`
          0 - Otherwise (operand is a variable name string):
                 emit `lw reg, {self.resolve_address(operand)}`
-
-        Note: this is only ever called with a literal or a variable
+           Note: this is only ever called with a literal or a variable
         name -- TripleRef operands are handled separately in gen_instr()
         by reusing the already-live register from triple_index_to_reg,
         never by loading from memory.
         """
+<<<<<<< HEAD
         # raise NotImplementedError("implement MIPSGenerator.load()")
 
     def store(self, reg, name):
@@ -124,9 +145,25 @@ class MIPSGenerator:
         deallocate_register(reg) -- once a value has been written back
         to a variable's slot, the register holding it is free to reuse.
         """
+=======
+
+        #raise NotImplementedError("implement MIPSGenerator.load()")
+
+    def store(self, reg, name):
+        self.addMIPS(f"sw {reg}, {self.resolve_address(name)}")
+        self.deallocate_register(reg)
+        """TODO(week-4): emit `sw reg, {self.resolve_address(name)}`, then
+        deallocate_register(reg) -- once a value has been written back
+        to a variable's slot, the register holding it is free to reuse.
+    """
+
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
         #raise NotImplementedError("implement MIPSGenerator.store()")
 
+       
+    
     def gen_instr(self, triple):
+<<<<<<< HEAD
         if isinstance(triple , BinOpTriple):
             if isinstance(triple.arg1 , TripleRef):
                 src1 = self.triple_index_to_reg[triple.arg1.index]
@@ -139,6 +176,20 @@ class MIPSGenerator:
             else :
                 src2 = self.allocate_registers()
                 self.load(triple.arg2 , src2)
+=======
+         if isinstance(triple, BinOpTriple):
+            if isinstance(triple.arg1, TripleRef):
+                src1 = self.triple_index_to_reg[triple.arg1.index]
+            else:
+                src1 = self.allocate_registers()
+                self.load(triple.arg1, src1)
+
+            if isinstance(triple.arg2, TripleRef):
+                src2 = self.triple_index_to_reg[triple.arg2.index]
+            else:
+                src2 = self.allocate_registers()
+                self.load(triple.arg2, src2)
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
 
             dest = self.allocate_registers()
             self.addMIPS(f"{MIPS_OP[triple.op]} {dest}, {src1}, {src2}")
@@ -147,6 +198,7 @@ class MIPSGenerator:
                 self.deallocate_register(src1)
             if not isinstance(triple.arg2, TripleRef):
                 self.deallocate_register(src2)
+<<<<<<< HEAD
 
         elif isinstance(triple, AssignTriple):
             if isinstance(triple.arg1 , TripleRef):
@@ -157,11 +209,17 @@ class MIPSGenerator:
             self.store(src, triple.dest)
 
         elif  isinstance(triple, PrintTriple):
+=======
+        
+
+         elif isinstance(triple,AssignTriple):
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
             if isinstance(triple.arg1, TripleRef):
                 src = self.triple_index_to_reg[triple.arg1.index]
             else:
                 src = self.allocate_registers()
                 self.load(triple.arg1, src)
+<<<<<<< HEAD
 
             self.addMIPS(f"move $a0, {src}")
             self.addMIPS("li $v0, 1")
@@ -203,6 +261,24 @@ class MIPSGenerator:
         example of this dispatch on a small triple program, including
         exactly which registers get allocated/reused/freed at each step.
         """
+=======
+            self.store(src, triple.dest)
+         elif isinstance(triple, PrintTriple):
+             if isinstance(triple.arg1, TripleRef):
+                 reg= self.triple_index_to_reg[triple.arg1.index]
+                 reg_fresh=False
+             else:
+                 reg=self.allocate_registers()
+                 self.load(triple.arg1,reg)
+                 reg_fresh=True
+
+             self.addMIPS(f"move $a0, {reg}")
+             self.addMIPS("li $v0, 1")
+             self.addMIPS("syscall")
+            #self.deallocate_register(triple.arg1)
+
+        
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
         #raise NotImplementedError("implement MIPSGenerator.gen_instr()")
 
     # ------------------------------------------------------------------
@@ -217,6 +293,8 @@ class MIPSGenerator:
         self.addMIPS(f"addiu $fp, $sp, -{frame_size}")
         self.addMIPS("move $sp, $fp")
 
+
+        
     def emit_epilogue(self, frame_size):
         self.addMIPS(f"addiu $sp, $fp, {frame_size}")
         self.addMIPS("lw    $fp, 0($sp)")
