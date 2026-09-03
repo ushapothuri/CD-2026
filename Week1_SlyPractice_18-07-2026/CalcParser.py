@@ -49,6 +49,10 @@ class CalcParser(Parser):
     def F(self, value):
         return value[0]
 
+    @_('NUMBER "^" F')
+    def F(self, value):
+        return value[0] ** value[2]
+
 
 lexer = CalcLexer()
 parser = CalcParser()

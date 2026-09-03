@@ -53,8 +53,25 @@ class TinyCStrLexer(Lexer):
         t.type = self.keywords.get(t.value, 'ID')
         return t
 
+<<<<<<< HEAD
+    @_(r'\d+')
+    def NUMBER(self, t):
+        t.value = int(t.value)
+        return t
+
+    LT = r'<'
+    GT = r'>'
+    LE = r'<='
+    GE = r'>='
+    EQ = r'=='
+    NE = r'!='
+    QUESTION = r'\?'
+    COLON = r':'
+
+=======
     
     
+>>>>>>> 6eded1e3ff9669780beba154cac6c81b9bebc9c1
     ASSIGN = r'='
     SEMICOLON = r';'
     LBRACE = r'\{'
@@ -67,6 +84,26 @@ class TinyCStrLexer(Lexer):
     REMAINDER = r'%'
     LPAREN = r'\('
     RPAREN = r'\)'
+
+
+    @_(r'\d+\.\d+')
+    def REAL_CONST(self , t):
+        t.value = float(t.value)
+        return t
+
+    """
+    @_(r"([^'\\]|\\.)'")
+    """
+    @_(r"'.'")
+    def CHAR_CONST(self , t):
+        t.value = t.value[1:-1]
+        return t
+
+   
+    @_(r'".*"')  
+    def STRING_CONST(self , t):
+        t.value = t.value[1:-1]
+        return t
 
     # ------------------------------------------------------------------
     # LEVEL 2, Stage 2a -- real constants
